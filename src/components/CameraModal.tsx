@@ -3,9 +3,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Camera, CameraOff, Image } from "lucide-react";
+import { Camera as LucideCamera, CameraOff, Image } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { Camera as ExpoCamera } from "expo-camera";
+import * as ExpoCamera from "expo-camera";
 
 interface CameraModalProps {
   isOpen: boolean;
@@ -16,7 +16,7 @@ interface CameraModalProps {
 const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const cameraRef = useRef<ExpoCamera | null>(null);
+  const cameraRef = useRef<any>(null);
 
   const requestCameraPermission = async () => {
     if (Platform.OS !== 'web') {
@@ -133,6 +133,45 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
     }
   }, [isOpen]);
 
+  const renderCamera = () => {
+    if (Platform.OS === 'web') {
+      if (isCameraActive) {
+        return (
+          <video
+            autoPlay
+            playsInline
+            muted
+            className="h-auto w-full"
+          />
+        );
+      }
+      return (
+        <div className="flex h-64 w-full items-center justify-center bg-muted">
+          <CameraOff className="h-12 w-12 text-muted-foreground" />
+        </div>
+      );
+    }
+
+    // Native platforms (iOS/Android)
+    if (isCameraActive && hasCameraPermission) {
+      return (
+        <View style={{ height: 300 }}>
+          <ExpoCamera.Camera
+            ref={cameraRef}
+            style={StyleSheet.absoluteFillObject}
+            type={ExpoCamera.CameraType.front}
+          />
+        </View>
+      );
+    }
+    
+    return (
+      <View style={{ height: 300, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f1f1f1' }}>
+        <CameraOff size={48} color="#666" />
+      </View>
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
@@ -141,48 +180,17 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">
           <div className="relative w-full overflow-hidden rounded-lg bg-muted">
-            {Platform.OS !== 'web' ? (
-              isCameraActive && hasCameraPermission ? (
-                <View style={{ height: 300 }}>
-                  {Platform.OS === 'android' || Platform.OS === 'ios' ? (
-                    <ExpoCamera
-                      ref={cameraRef}
-                      style={StyleSheet.absoluteFillObject}
-                      type={ExpoCamera.Constants?.Type?.front || 0}
-                    />
-                  ) : (
-                    <View style={StyleSheet.absoluteFillObject} />
-                  )}
-                </View>
-              ) : (
-                <div className="flex h-64 w-full items-center justify-center bg-muted">
-                  <CameraOff className="h-12 w-12 text-muted-foreground" />
-                </div>
-              )
-            ) : (
-              isCameraActive ? (
-                <video
-                  autoPlay
-                  playsInline
-                  muted
-                  className="h-auto w-full"
-                />
-              ) : (
-                <div className="flex h-64 w-full items-center justify-center bg-muted">
-                  <CameraOff className="h-12 w-12 text-muted-foreground" />
-                </div>
-              )
-            )}
+            {renderCamera()}
           </div>
           
           <div className="flex w-full justify-center space-x-4">
             {isCameraActive ? (
               <Button onClick={capturePhoto} className="bg-festival-purple">
-                <Camera className="mr-2 h-4 w-4" /> Capture Photo
+                <LucideCamera className="mr-2 h-4 w-4" /> Capture Photo
               </Button>
             ) : (
               <Button onClick={requestCameraPermission} className="bg-festival-blue">
-                <Camera className="mr-2 h-4 w-4" /> Start Camera
+                <LucideCamera className="mr-2 h-4 w-4" /> Start Camera
               </Button>
             )}
             <Button variant="outline" onClick={handleClose}>
