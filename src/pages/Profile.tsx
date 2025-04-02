@@ -1,21 +1,57 @@
 
+import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, Settings, Bookmark, Link2, Ticket, ChevronRight } from "lucide-react";
+import { User, Settings, Bookmark, Link2, Ticket, ChevronRight, Camera } from "lucide-react";
+import CameraModal from "@/components/CameraModal";
+import { toast } from "@/hooks/use-toast";
 
 const Profile = () => {
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
+
+  const handleCapture = (imageUrl: string) => {
+    setProfileImage(imageUrl);
+    setShowCamera(false);
+    toast({
+      title: "Profile updated",
+      description: "Your facial recognition photo has been set as your profile picture",
+    });
+  };
+
   return (
     <div className="flex flex-col items-center pt-6 pb-20 px-4">
       {/* Profile Header */}
       <div className="w-full flex flex-col items-center mb-8">
-        <Avatar className="h-24 w-24 mb-4 border-2 border-festival-purple"><AvatarImage src="" />
-          <AvatarFallback className="bg-muted">
-            <User className="h-12 w-12 text-muted-foreground" />
-          </AvatarFallback>
-        </Avatar>
-        <h1 className="text-xl font-bold">[Name]</h1>
+        <div className="relative">
+          <Avatar className="h-24 w-24 mb-4 border-2 border-festival-purple">
+            <AvatarImage src={profileImage || ""} />
+            <AvatarFallback className="bg-muted">
+              <User className="h-12 w-12 text-muted-foreground" />
+            </AvatarFallback>
+          </Avatar>
+          <Button 
+            onClick={() => setShowCamera(true)}
+            size="icon"
+            variant="outline"
+            className="absolute bottom-3 right-0 rounded-full bg-white dark:bg-gray-800 border border-festival-purple hover:bg-festival-purple hover:text-white"
+          >
+            <Camera className="h-4 w-4" />
+          </Button>
+        </div>
+        <h1 className="text-xl font-bold">Festival Goer</h1>
+        {profileImage && (
+          <p className="text-xs text-festival-purple mt-1">Facial recognition enabled</p>
+        )}
       </div>
+
+      {/* Camera Modal */}
+      <CameraModal 
+        isOpen={showCamera} 
+        onClose={() => setShowCamera(false)}
+        onCapture={handleCapture}
+      />
 
       {/* Profile Menu */}
       <div className="w-full space-y-3">
