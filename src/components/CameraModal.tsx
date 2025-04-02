@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Camera as LucideCamera, CameraOff, Image } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import * as ExpoCamera from "expo-camera";
+import { Camera } from "expo-camera";
+import { CameraType } from "expo-camera";
 
 interface CameraModalProps {
   isOpen: boolean;
@@ -16,11 +17,11 @@ interface CameraModalProps {
 const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const cameraRef = useRef<any>(null);
+  const cameraRef = useRef<Camera | null>(null);
 
   const requestCameraPermission = async () => {
     if (Platform.OS !== 'web') {
-      const { status } = await ExpoCamera.requestCameraPermissionsAsync();
+      const { status } = await Camera.requestCameraPermissionsAsync();
       setHasCameraPermission(status === 'granted');
       
       if (status === 'granted') {
@@ -156,10 +157,10 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
     if (isCameraActive && hasCameraPermission) {
       return (
         <View style={{ height: 300 }}>
-          <ExpoCamera.Camera
+          <Camera
             ref={cameraRef}
             style={StyleSheet.absoluteFillObject}
-            type={ExpoCamera.CameraType.front}
+            type={CameraType.front}
           />
         </View>
       );
