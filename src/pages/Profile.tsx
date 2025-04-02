@@ -1,11 +1,12 @@
+
 import { useState } from "react";
+import { View, Platform } from "react-native";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { User, Settings, Bookmark, Link2, Ticket, ChevronRight, Camera } from "lucide-react";
 import CameraModal from "@/components/CameraModal";
 import { toast } from "@/hooks/use-toast";
-import { View, Platform } from "react-native";
 
 const Profile = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);

@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -16,11 +16,11 @@ interface CameraModalProps {
 const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const cameraRef = useRef<ExpoCamera>(null);
+  const cameraRef = useRef<ExpoCamera | null>(null);
 
   const requestCameraPermission = async () => {
     if (Platform.OS !== 'web') {
-      const { status } = await ExpoCamera.requestPermissionsAsync();
+      const { status } = await ExpoCamera.requestCameraPermissionsAsync();
       setHasCameraPermission(status === 'granted');
       
       if (status === 'granted') {
@@ -125,7 +125,7 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
   };
 
   // Start camera when modal opens
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       requestCameraPermission();
     } else {
@@ -144,11 +144,15 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
             {Platform.OS !== 'web' ? (
               isCameraActive && hasCameraPermission ? (
                 <View style={{ height: 300 }}>
-                  <ExpoCamera
-                    ref={cameraRef}
-                    style={StyleSheet.absoluteFillObject}
-                    type={ExpoCamera.Constants.Type.front}
-                  />
+                  {Platform.OS === 'android' || Platform.OS === 'ios' ? (
+                    <ExpoCamera
+                      ref={cameraRef}
+                      style={StyleSheet.absoluteFillObject}
+                      type={ExpoCamera.Constants?.Type?.front || 0}
+                    />
+                  ) : (
+                    <View style={StyleSheet.absoluteFillObject} />
+                  )}
                 </View>
               ) : (
                 <div className="flex h-64 w-full items-center justify-center bg-muted">
