@@ -1,9 +1,11 @@
 
-import React, { useRef, useState } from "react";
+import React, { useState, useRef } from "react";
+import { View, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Camera, CameraOff, Image } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Camera as ExpoCamera } from "expo-camera";
 
 interface CameraModalProps {
   isOpen: boolean;
@@ -12,43 +14,54 @@ interface CameraModalProps {
 }
 
 const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cameraRef = useRef<ExpoCamera>(null);
 
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
-      });
-      setStream(mediaStream);
-      setIsCameraActive(true);
+  const requestCameraPermission = async () => {
+    if (Platform.OS !== 'web') {
+      const { status } = await ExpoCamera.requestPermissionsAsync();
+      setHasCameraPermission(status === 'granted');
       
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
+      if (status === 'granted') {
+        setIsCameraActive(true);
+        toast({
+          title: "Camera started",
+          description: "Position your face in the frame",
+        });
+      } else {
+        toast({
+          title: "Camera error",
+          description: "Could not access your camera. Please check permissions.",
+          variant: "destructive",
+        });
       }
-      
-      toast({
-        title: "Camera started",
-        description: "Position your face in the frame",
-      });
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      toast({
-        title: "Camera error",
-        description: "Could not access your camera. Please check permissions.",
-        variant: "destructive",
-      });
+    } else {
+      // Web fallback
+      try {
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+        });
+        setHasCameraPermission(true);
+        setIsCameraActive(true);
+        toast({
+          title: "Camera started",
+          description: "Position your face in the frame",
+        });
+      } catch (error) {
+        console.error("Error accessing camera:", error);
+        setHasCameraPermission(false);
+        toast({
+          title: "Camera error",
+          description: "Could not access your camera. Please check permissions.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-      setIsCameraActive(false);
-    }
+    setIsCameraActive(false);
   };
 
   const handleClose = () => {
@@ -56,22 +69,16 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
     onClose();
   };
 
-  const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      
-      // Set canvas dimensions to match video
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      
-      // Draw the current video frame to the canvas
-      const context = canvas.getContext("2d");
-      if (context) {
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const capturePhoto = async () => {
+    if (cameraRef.current && Platform.OS !== 'web') {
+      try {
+        const photo = await cameraRef.current.takePictureAsync({
+          quality: 0.8,
+          base64: true,
+        });
         
-        // Convert canvas to data URL
-        const imageDataUrl = canvas.toDataURL("image/png");
+        // Convert to base64 data URL format for consistency with web version
+        const imageDataUrl = `data:image/jpeg;base64,${photo.base64}`;
         
         // Send image data to parent component
         onCapture(imageDataUrl);
@@ -83,20 +90,44 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
         
         // Close modal and stop camera
         handleClose();
+      } catch (error) {
+        console.error("Error capturing photo:", error);
+        toast({
+          title: "Error",
+          description: "Failed to capture photo",
+          variant: "destructive",
+        });
+      }
+    } else if (Platform.OS === 'web') {
+      // Web fallback using canvas
+      const video = document.querySelector('video');
+      const canvas = document.createElement('canvas');
+      
+      if (video) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        const context = canvas.getContext('2d');
+        if (context) {
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageDataUrl = canvas.toDataURL("image/png");
+          onCapture(imageDataUrl);
+          
+          toast({
+            title: "Picture captured",
+            description: "Your facial recognition photo has been saved",
+          });
+          
+          handleClose();
+        }
       }
     }
   };
 
-  // Clean up on unmount
-  React.useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, []);
-
+  // Start camera when modal opens
   React.useEffect(() => {
     if (isOpen) {
-      startCamera();
+      requestCameraPermission();
     } else {
       stopCamera();
     }
@@ -110,22 +141,35 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">
           <div className="relative w-full overflow-hidden rounded-lg bg-muted">
-            {isCameraActive ? (
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="h-auto w-full"
-              />
+            {Platform.OS !== 'web' ? (
+              isCameraActive && hasCameraPermission ? (
+                <View style={{ height: 300 }}>
+                  <ExpoCamera
+                    ref={cameraRef}
+                    style={StyleSheet.absoluteFillObject}
+                    type={ExpoCamera.Constants.Type.front}
+                  />
+                </View>
+              ) : (
+                <div className="flex h-64 w-full items-center justify-center bg-muted">
+                  <CameraOff className="h-12 w-12 text-muted-foreground" />
+                </div>
+              )
             ) : (
-              <div className="flex h-64 w-full items-center justify-center bg-muted">
-                <CameraOff className="h-12 w-12 text-muted-foreground" />
-              </div>
+              isCameraActive ? (
+                <video
+                  autoPlay
+                  playsInline
+                  muted
+                  className="h-auto w-full"
+                />
+              ) : (
+                <div className="flex h-64 w-full items-center justify-center bg-muted">
+                  <CameraOff className="h-12 w-12 text-muted-foreground" />
+                </div>
+              )
             )}
           </div>
-          {/* Hidden canvas for capturing the image */}
-          <canvas ref={canvasRef} style={{ display: "none" }} />
           
           <div className="flex w-full justify-center space-x-4">
             {isCameraActive ? (
@@ -133,7 +177,7 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
                 <Camera className="mr-2 h-4 w-4" /> Capture Photo
               </Button>
             ) : (
-              <Button onClick={startCamera} className="bg-festival-blue">
+              <Button onClick={requestCameraPermission} className="bg-festival-blue">
                 <Camera className="mr-2 h-4 w-4" /> Start Camera
               </Button>
             )}
