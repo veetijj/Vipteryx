@@ -25,15 +25,6 @@ const Layout = () => {
         style={{ height: statusBarHeight }}
         className="bg-black text-white flex items-center justify-between px-4 text-xs"
       >
-        <div className="flex items-center">
-          <span>9:41</span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div className="h-2.5 w-2.5 rounded-full bg-white"></div>
-          <div className="h-2.5 w-2.5 rounded-full bg-white"></div>
-          <div className="h-2.5 w-2.5 rounded-full bg-white"></div>
-          <div className="h-2.5 w-2.5 rounded-full bg-white"></div>
-        </div>
       </div>
       
       {/* Content area */}

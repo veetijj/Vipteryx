@@ -31,7 +31,7 @@ const VenuesSheet: React.FC<VenuesSheetProps> = ({
       <SheetTrigger asChild>
         <Button 
           variant="secondary" 
-          className="absolute bottom-4 left-4 right-4 shadow-lg h-12 bg-white/90 backdrop-blur-sm hover:bg-white/95 flex items-center justify-center text-sm font-medium z-10"
+          className="absolute bottom-4 left-4 right-4 shadow-lg h-12 bg-black/90 backdrop-blur-sm hover:bg-white/95 flex items-center justify-center text-sm font-medium z-10"
         >
           <span>Nearby Venues</span>
           <ChevronUp className="ml-1 h-4 w-4" />

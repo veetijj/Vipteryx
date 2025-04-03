@@ -9,7 +9,7 @@ const StaticMapDisplay: React.FC = () => {
       <div className="relative w-full h-full">
         {/* Static festival map image */}
         <img 
-          src="https://i.imgur.com/xG6vYGH.jpg" 
+          src="/pics/map.png" 
           alt="Festival Map" 
           className="w-full h-full object-cover"
         />
@@ -23,7 +23,7 @@ const StaticMapDisplay: React.FC = () => {
         <VenueMarker 
           type="stage" 
           title="Dance Arena" 
-          position={{ top: "25%", left: "50%" }} 
+          position={{ top: "33%", left: "50%" }} 
         />
         <VenueMarker 
           type="food" 
