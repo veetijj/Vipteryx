@@ -2,6 +2,8 @@
 import React from "react";
 import VenueMarker from "./VenueMarker";
 import UserLocationMarker from "./UserLocationMarker";
+import FriendMarker from "./FriendMarker";
+import { friends } from "@/data/friends";
 
 const StaticMapDisplay: React.FC = () => {
   return (
@@ -40,6 +42,16 @@ const StaticMapDisplay: React.FC = () => {
           title="Restrooms" 
           position={{ top: "50%", left: "66%" }} 
         />
+        
+        {/* Friend markers */}
+        {friends.map(friend => (
+          <FriendMarker 
+            key={friend.id}
+            name={friend.name}
+            image={friend.image}
+            position={friend.location || { top: "50%", left: "50%" }}
+          />
+        ))}
         
         {/* User location - static position */}
         <UserLocationMarker position={{ top: "50%", left: "50%" }} />

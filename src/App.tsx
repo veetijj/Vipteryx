@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import ConnectedApps from "./pages/ConnectedApps";
 import TicketsPage from "./pages/TicketsPage";
 import EventMap from "./pages/EventMap";
+import Friends from "./pages/Friends";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="connected-apps" element={<ConnectedApps />} />
             <Route path="tickets" element={<TicketsPage />} />
             <Route path="map" element={<EventMap />} />
+            <Route path="friends" element={<Friends />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
