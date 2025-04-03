@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -49,7 +48,7 @@ const VenuesSheet: React.FC<VenuesSheetProps> = ({
               <VenueItem 
                 key={venue.id} 
                 venue={venue} 
-                onSelect={onVenueSelect} 
+                onSelect={() => {}} // Remove the onVenueSelect functionality
               />
             ))
           ) : (

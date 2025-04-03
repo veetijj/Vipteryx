@@ -1,4 +1,3 @@
-
 import React from "react";
 
 interface VenueMarkerProps {
@@ -8,6 +7,7 @@ interface VenueMarkerProps {
     top: string;
     left: string;
   };
+  onClick?: () => void; // Add optional onClick prop
 }
 
 const getMarkerColor = (type: string): string => {
@@ -20,7 +20,7 @@ const getMarkerColor = (type: string): string => {
   }
 };
 
-const VenueMarker: React.FC<VenueMarkerProps> = ({ type, title, position }) => {
+const VenueMarker: React.FC<VenueMarkerProps> = ({ type, title, position, onClick }) => {
   const markerColor = getMarkerColor(type);
   
   return (
@@ -28,6 +28,10 @@ const VenueMarker: React.FC<VenueMarkerProps> = ({ type, title, position }) => {
       className={`absolute w-5 h-5 rounded-full ${markerColor} border-2 border-white`} 
       style={{ top: position.top, left: position.left }}
       title={title}
+      onClick={() => {
+        console.log(`Marker clicked: ${title}`); // Debug log
+        if (onClick) onClick(); // Trigger onClick if provided
+      }}
     />
   );
 };

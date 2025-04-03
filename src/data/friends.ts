@@ -5,7 +5,7 @@ export const friends: Friend[] = [
   {
     id: "1",
     name: "Custard Calle",
-    image: "/pics/avatar1.png", 
+    image: "/pics/absolutecinema.png", 
     location: {
       top: "45%",
       left: "55%"

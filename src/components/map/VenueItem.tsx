@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,7 +25,7 @@ const VenueItem: React.FC<VenueItemProps> = ({ venue, onSelect }) => {
           <Button 
             size="sm" 
             variant="outline"
-            onClick={() => onSelect(venue.id)}
+            onClick={() => {}} // Remove the onSelect functionality
           >
             Route
           </Button>

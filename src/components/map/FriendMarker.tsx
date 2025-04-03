@@ -1,4 +1,3 @@
-
 import React from "react";
 import { User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -10,14 +9,16 @@ interface FriendMarkerProps {
     top: string;
     left: string;
   };
+  onClick: () => void; // New prop
 }
 
-const FriendMarker: React.FC<FriendMarkerProps> = ({ name, image, position }) => {
+const FriendMarker: React.FC<FriendMarkerProps> = ({ name, image, position, onClick }) => {
   return (
     <div 
-      className="absolute transform -translate-x-1/2 -translate-y-1/2 z-20"
+      className="absolute transform -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer"
       style={{ top: position.top, left: position.left }}
       title={name}
+      onClick={onClick} // Trigger onClick when clicked
     >
       <div className="relative">
         <Avatar className="h-8 w-8 border-2 border-white shadow-lg">
