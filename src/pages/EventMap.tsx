@@ -1,43 +1,14 @@
 
-import React, { useState, useEffect, useRef } from "react";
-import { Search, Layers, Navigation, ChevronUp } from "lucide-react";
+import React, { useState } from "react";
+import { Search, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-
-// Temporary access token input component
-const MapboxTokenInput = ({ onTokenSubmit }: { onTokenSubmit: (token: string) => void }) => {
-  const [token, setToken] = useState('');
-  
-  return (
-    <div className="absolute top-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-4 z-50 flex flex-col gap-2">
-      <h3 className="text-sm font-medium">Enter your Mapbox access token to view the map</h3>
-      <div className="flex gap-2">
-        <Input 
-          value={token} 
-          onChange={(e) => setToken(e.target.value)} 
-          placeholder="pk.eyJ1..." 
-          className="flex-1"
-        />
-        <Button onClick={() => onTokenSubmit(token)}>Set Token</Button>
-      </div>
-      <p className="text-xs text-muted-foreground">
-        Get your token at <a href="https://mapbox.com/" className="underline" target="_blank" rel="noreferrer">mapbox.com</a>
-      </p>
-    </div>
-  );
-};
 
 const EventMap = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [mapboxToken, setMapboxToken] = useState<string | null>(
-    localStorage.getItem('mapbox_token')
-  );
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
   
   const venues = [
     { id: "1", name: "Main Stage", type: "stage", distance: "250m", coordinates: [-74.005, 40.712] },
@@ -51,94 +22,43 @@ const EventMap = () => {
     venue.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Handle map token submission
-  const handleTokenSubmit = (token: string) => {
-    localStorage.setItem('mapbox_token', token);
-    setMapboxToken(token);
+  // Function to handle venue selection
+  const handleVenueSelect = (venueId: string) => {
+    console.log(`Selected venue: ${venueId}`);
+    // In a real app, this would center the map on the venue or highlight it
   };
-
-  // Initialize map when token is available
-  useEffect(() => {
-    if (!mapboxToken || !mapContainer.current || map.current) return;
-    
-    try {
-      mapboxgl.accessToken = mapboxToken;
-      
-      const newMap = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/dark-v11',
-        center: [-74.005, 40.712], // Festival location (NYC for demo)
-        zoom: 15,
-        pitch: 40,
-      });
-      
-      // Add navigation controls
-      newMap.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-      
-      // Add markers for venues
-      venues.forEach(venue => {
-        const el = document.createElement('div');
-        el.className = 'venue-marker';
-        el.style.width = '20px';
-        el.style.height = '20px';
-        el.style.borderRadius = '50%';
-        
-        // Color based on venue type
-        switch(venue.type) {
-          case 'stage':
-            el.style.backgroundColor = '#8a2be2'; // Purple for stages
-            break;
-          case 'food':
-            el.style.backgroundColor = '#ff9800'; // Orange for food
-            break;
-          case 'vip':
-            el.style.backgroundColor = '#ffd700'; // Gold for VIP
-            break;
-          default:
-            el.style.backgroundColor = '#03a9f4'; // Blue for others
-        }
-        
-        el.style.border = '2px solid #ffffff';
-        
-        new mapboxgl.Marker(el)
-          .setLngLat(venue.coordinates)
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 })
-              .setHTML(`<h3>${venue.name}</h3><p>${venue.type}</p>`)
-          )
-          .addTo(newMap);
-      });
-      
-      // Add user location (simulated)
-      const userEl = document.createElement('div');
-      userEl.className = 'user-marker pulse';
-      userEl.style.width = '16px';
-      userEl.style.height = '16px';
-      userEl.style.borderRadius = '50%';
-      userEl.style.backgroundColor = '#03a9f4';
-      userEl.style.border = '3px solid #ffffff';
-      
-      new mapboxgl.Marker(userEl)
-        .setLngLat([-74.005, 40.712])
-        .addTo(newMap);
-        
-      map.current = newMap;
-    } catch (error) {
-      console.error('Error initializing map:', error);
-    }
-    
-    return () => {
-      map.current?.remove();
-    };
-  }, [mapboxToken]);
 
   return (
     <div className="relative h-[calc(100vh-96px)]">
-      {/* Map container */}
-      <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700" ref={mapContainer}>
-        {!mapboxToken && (
-          <MapboxTokenInput onTokenSubmit={handleTokenSubmit} />
-        )}
+      {/* Static Map container */}
+      <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+        <div className="relative w-full h-full">
+          {/* Static festival map image */}
+          <img 
+            src="https://i.imgur.com/xG6vYGH.jpg" 
+            alt="Festival Map" 
+            className="w-full h-full object-cover"
+          />
+          
+          {/* Map venue markers - static positions */}
+          <div className="absolute top-1/3 left-1/4 w-5 h-5 rounded-full bg-purple-600 border-2 border-white" 
+               title="Main Stage"></div>
+          <div className="absolute top-1/4 left-1/2 w-5 h-5 rounded-full bg-purple-600 border-2 border-white" 
+               title="Dance Arena"></div>
+          <div className="absolute top-1/2 left-1/3 w-5 h-5 rounded-full bg-orange-500 border-2 border-white" 
+               title="Food Court"></div>
+          <div className="absolute top-2/3 left-2/3 w-5 h-5 rounded-full bg-yellow-500 border-2 border-white" 
+               title="VIP Area"></div>
+          <div className="absolute top-1/2 left-2/3 w-5 h-5 rounded-full bg-blue-500 border-2 border-white" 
+               title="Restrooms"></div>
+          
+          {/* User location - static position */}
+          <div className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full bg-blue-500 border-2 border-white pulse"
+               title="You are here"></div>
+          
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-background/10"></div>
+        </div>
       </div>
       
       {/* Search Overlay */}
@@ -152,37 +72,6 @@ const EventMap = () => {
           />
           <Search className="absolute top-2.5 right-3 h-4 w-4 text-muted-foreground" />
         </div>
-      </div>
-      
-      {/* Map Controls */}
-      <div className="absolute top-16 right-4 flex flex-col space-y-2 z-10">
-        <Button 
-          size="icon" 
-          variant="secondary" 
-          className="bg-white/90 backdrop-blur-sm shadow-lg"
-          onClick={() => map.current?.setStyle('mapbox://styles/mapbox/' + 
-            (map.current?.getStyle().name.includes('Dark') ? 'light' : 'dark') + '-v11')}
-        >
-          <Layers className="h-4 w-4" />
-        </Button>
-        <Button 
-          size="icon" 
-          variant="secondary" 
-          className="bg-white/90 backdrop-blur-sm shadow-lg"
-          onClick={() => {
-            if (map.current) {
-              map.current.flyTo({
-                center: [-74.005, 40.712],
-                zoom: 15,
-                bearing: 0,
-                pitch: 40,
-                duration: 1500
-              });
-            }
-          }}
-        >
-          <Navigation className="h-4 w-4" />
-        </Button>
       </div>
       
       {/* Bottom Sheet */}
@@ -216,16 +105,7 @@ const EventMap = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => {
-                          const venueCoords = venues.find(v => v.id === venue.id)?.coordinates;
-                          if (venueCoords && map.current) {
-                            map.current.flyTo({
-                              center: venueCoords,
-                              zoom: 18,
-                              duration: 1000
-                            });
-                          }
-                        }}
+                        onClick={() => handleVenueSelect(venue.id)}
                       >
                         Route
                       </Button>
