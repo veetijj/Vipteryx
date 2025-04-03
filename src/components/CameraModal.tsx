@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,7 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        videoRef.current.play(); // Ensure the video starts playing
       }
       
       toast({
@@ -81,26 +81,24 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
           description: "Your facial recognition photo has been saved",
         });
         
-        // Close modal and stop camera
-        handleClose();
+        // Stop camera but keep modal open
+        stopCamera();
       }
     }
   };
 
-  // Clean up on unmount
   React.useEffect(() => {
-    return () => {
-      stopCamera();
-    };
-  }, []);
-
-  React.useEffect(() => {
-    if (isOpen) {
-      startCamera();
-    } else {
+    if (!isOpen) {
       stopCamera();
     }
   }, [isOpen]);
+
+  React.useEffect(() => {
+    if (isCameraActive && videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+      videoRef.current.play(); // Ensure the video starts playing
+    }
+  }, [isCameraActive, stream]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

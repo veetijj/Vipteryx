@@ -36,7 +36,7 @@ const NavItem = ({
         )
       }
     >
-      <div className="w-6 h-6">
+      <div className="w-6 h-7 flex items-center justify-center">
         {icon}
       </div>
       <span className="text-xs mt-1">{label}</span>

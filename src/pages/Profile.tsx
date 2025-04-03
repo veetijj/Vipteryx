@@ -42,7 +42,7 @@ const Profile = () => {
         </div>
         <h1 className="text-xl font-bold">Festival Goer</h1>
         {profileImage && (
-          <p className="text-xs text-festival-purple mt-1">Facial recognition enabled</p>
+          <p className="text-xl text-festival-purple mt-1">Facial recognition enabled</p>
         )}
       </div>
 
