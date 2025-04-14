@@ -7,9 +7,10 @@ import { friends } from "@/data/friends";
 interface StaticMapDisplayProps {
   onFriendSelect: (friend: Friend) => void;
   onVenueSelect: (venueId: string) => void; // Add onVenueSelect prop
+  crowdDensity: { [key: string]: number };
 }
 
-const StaticMapDisplay: React.FC<StaticMapDisplayProps> = ({ onFriendSelect, onVenueSelect }) => {
+const StaticMapDisplay: React.FC<StaticMapDisplayProps> = ({ onFriendSelect, onVenueSelect, crowdDensity }) => {
   return (
     <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
       <div className="relative w-full h-full">
@@ -19,7 +20,28 @@ const StaticMapDisplay: React.FC<StaticMapDisplayProps> = ({ onFriendSelect, onV
           alt="Festival Map" 
           className="w-full h-full object-cover"
         />
-        
+
+        {/* Render crowd density markers */}
+        {/* Static crowd density markers */}
+        <div
+          className="absolute w-8 h-8 rounded-full bg-red-500 opacity-75"
+          style={{ top: "49%", left: "65%" }}
+          title="Crowd Density: High (Restrooms)"
+          onClick={() => onVenueSelect("restrooms")}
+        />
+        <div
+          className="absolute w-8 h-8 rounded-full bg-yellow-500 opacity-75"
+          style={{ top: "32%", left: "24%" }}
+          title="Crowd Density: Medium (Main Stage)"
+          onClick={() => onVenueSelect("main-stage")}
+        />
+        <div
+          className="absolute w-8 h-8 rounded-full bg-green-500 opacity-75"
+          style={{ top: "49%", left: "32%" }}
+          title="Crowd Density: Low (Food Court)"
+          onClick={() => onVenueSelect("food-court")}
+        />
+
         {/* Map venue markers - static positions */}
         <VenueMarker 
           type="stage" 

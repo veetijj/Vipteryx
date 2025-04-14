@@ -11,11 +11,21 @@ import FriendProfile from "@/components/friends/FriendProfile";
 import VenueProfile from "@/components/map/VenueProfile"; // Import the new component
 import { venues } from "@/components/map/data/venues";
 import { Friend } from "@/types/friend";
+import QuickAccessMenu from "@/components/QuickAccessMenu";
+import FavoritePlaces from "@/components/FavoritePlaces";
 
 const EventMap: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [favorites, setFavorites] = useState<{ id: string; name: string }[]>([]);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [selectedVenue, setSelectedVenue] = useState<{ name: string; distance: string } | null>(null); // Add state for selected venue
+  const [crowdDensity, setCrowdDensity] = useState({
+    "main-stage": 45,
+    "food-court": 60,
+    "vip-area": 20,
+    "restrooms": 70,
+    "dance-arena": 30,
+  });
 
   const filteredVenues = venues.filter(venue => 
     venue.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -33,6 +43,23 @@ const EventMap: React.FC = () => {
     }
   };
 
+  const handleQuickAccessSelect = (locationId: string) => {
+    console.log(`Quick access selected: ${locationId}`);
+    handleVenueSelect(locationId); // Navigate to the selected location
+  };
+
+  const handleAddToFavorites = (venueId: string) => {
+    const venue = venues.find(v => v.id === venueId);
+    if (venue && !favorites.find(f => f.id === venueId)) {
+      setFavorites(prev => [...prev, { id: venueId, name: venue.name }]);
+    }
+  };
+
+  // Remove a venue from the favorites list
+  const handleRemoveFavorite = (venueId: string) => {
+    setFavorites(prev => prev.filter(f => f.id !== venueId));
+  };
+
   const handleFriendSelect = (friend: Friend) => {
     setSelectedFriend(friend);
   };
@@ -47,10 +74,14 @@ const EventMap: React.FC = () => {
 
   return (
     <div className="relative h-[calc(100vh-96px)]">
+      {/* Quick Access Menu */}
+      <QuickAccessMenu onSelect={handleQuickAccessSelect} />
+
       {/* Static Map */}
       <StaticMapDisplay 
         onFriendSelect={handleFriendSelect} 
         onVenueSelect={handleVenueSelect} // Pass handleVenueSelect to StaticMapDisplay
+        crowdDensity={crowdDensity}
       />
       
       {/* Search Bar */}
@@ -81,7 +112,6 @@ const EventMap: React.FC = () => {
         venue={selectedVenue} 
         onClose={handleCloseVenueProfile} 
       />
-
       {/* CSS for pulse animation */}
       <PulseAnimation />
     </div>
