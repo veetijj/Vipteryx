@@ -1,6 +1,5 @@
-
 import { NavLink } from "react-router-dom";
-import { Home, User, Ticket, Map, Link2, Users } from "lucide-react";
+import { Home, User, Map } from "lucide-react"; // Removed unused icons
 import { cn } from "@/lib/utils";
 
 const BottomNavigation = () => {
@@ -8,10 +7,7 @@ const BottomNavigation = () => {
     <div className="h-16 border-t bg-white dark:bg-gray-900 flex items-center justify-around px-4">
       <NavItem to="/" icon={<Home />} label="Home" />
       <NavItem to="/profile" icon={<User />} label="Profile" />
-      <NavItem to="/tickets" icon={<Ticket />} label="Tickets" />
-      <NavItem to="/friends" icon={<Users />} label="Friends" />
       <NavItem to="/map" icon={<Map />} label="Map" />
-      <NavItem to="/connected-apps" icon={<Link2 />} label="Connect" />
     </div>
   );
 };

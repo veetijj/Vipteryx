@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, Settings, Bookmark, Link2, Ticket, ChevronRight, Camera } from "lucide-react";
+import { User, Settings, Bookmark, Link2, Ticket, ChevronRight, Camera, Users } from "lucide-react";
 import CameraModal from "@/components/CameraModal";
 import { toast } from "@/hooks/use-toast";
 
@@ -92,19 +91,15 @@ const Profile = () => {
         />
       </div>
 
-      {/* App Info Card */}
-      <Card className="w-full mt-8 overflow-hidden">
-        <div className="h-3 festival-gradient w-full"></div>
-        <CardContent className="p-4">
-          <h3 className="text-sm font-medium mb-2">About Festival Companion</h3>
-          <p className="text-xs text-muted-foreground mb-4">
-            Your personalized guide to events. Connect apps and get tailored recommendations.
-          </p>
-          <Button variant="outline" size="sm" className="w-full text-xs">
-            Learn more
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Friends Section */}
+      <div className="w-full mt-8">
+        <h2 className="text-lg font-bold mb-4">Friends</h2>
+        <ProfileMenuItem 
+          icon={<Users className="h-5 w-5" />}
+          label="Manage Friends"
+          to="/friends"
+        />
+      </div>
     </div>
   );
 };
