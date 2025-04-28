@@ -21,11 +21,6 @@ const Layout = () => {
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden bg-background text-foreground">
       {/* Status bar simulation */}
-      <div 
-        style={{ height: statusBarHeight }}
-        className="bg-black text-white flex items-center justify-between px-4 text-xs"
-      >
-      </div>
       
       {/* Content area */}
       <div className="flex-1 overflow-y-auto">
