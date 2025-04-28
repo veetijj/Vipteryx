@@ -5,8 +5,8 @@ import { Camera, CameraOff, Image } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface CameraModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean; // Add isOpen prop to control visibility
+  onClose: () => void; // Add onClose prop to handle modal close
   onCapture: (imageUrl: string) => void;
 }
 
@@ -49,11 +49,7 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
       setStream(null);
       setIsCameraActive(false);
     }
-  };
-
-  const handleClose = () => {
-    stopCamera();
-    onClose();
+    onClose(); // Close modal when camera stops
   };
 
   const capturePhoto = () => {
@@ -88,12 +84,6 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
   };
 
   React.useEffect(() => {
-    if (!isOpen) {
-      stopCamera();
-    }
-  }, [isOpen]);
-
-  React.useEffect(() => {
     if (isCameraActive && videoRef.current && stream) {
       videoRef.current.srcObject = stream;
       videoRef.current.play(); // Ensure the video starts playing
@@ -101,7 +91,7 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
   }, [isCameraActive, stream]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}> {/* Use isOpen prop */}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Take Facial Recognition Photo</DialogTitle>
@@ -135,7 +125,7 @@ const CameraModal = ({ isOpen, onClose, onCapture }: CameraModalProps) => {
                 <Camera className="mr-2 h-4 w-4" /> Start Camera
               </Button>
             )}
-            <Button variant="outline" onClick={handleClose}>
+            <Button variant="outline" onClick={stopCamera}> {/* Call stopCamera */}
               Cancel
             </Button>
           </div>

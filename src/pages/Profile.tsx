@@ -2,17 +2,14 @@ import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, Settings, Bookmark, Link2, Ticket, ChevronRight, Camera, Users } from "lucide-react";
-import CameraModal from "@/components/CameraModal";
+import { User, Settings, Bookmark, Link2, Ticket, ChevronRight, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const Profile = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [showCamera, setShowCamera] = useState(false);
 
   const handleCapture = (imageUrl: string) => {
     setProfileImage(imageUrl);
-    setShowCamera(false);
     toast({
       title: "Profile updated",
       description: "Your facial recognition photo has been set as your profile picture",
@@ -30,14 +27,6 @@ const Profile = () => {
               <User className="h-12 w-12 text-muted-foreground" />
             </AvatarFallback>
           </Avatar>
-          <Button 
-            onClick={() => setShowCamera(true)}
-            size="icon"
-            variant="outline"
-            className="absolute bottom-3 right-0 rounded-full bg-white dark:bg-gray-800 border border-festival-purple hover:bg-festival-purple hover:text-white"
-          >
-            <Camera className="h-4 w-4" />
-          </Button>
         </div>
         <h1 className="text-xl font-bold">Festival Goer</h1>
         {profileImage && (
@@ -45,19 +34,12 @@ const Profile = () => {
         )}
       </div>
 
-      {/* Camera Modal */}
-      <CameraModal 
-        isOpen={showCamera} 
-        onClose={() => setShowCamera(false)}
-        onCapture={handleCapture}
-      />
-
       {/* Profile Menu */}
       <div className="w-full space-y-3">
         <ProfileMenuItem 
           icon={<User className="h-5 w-5" />}
           label="Personal Information"
-          to="#"
+          to="/personal-information"
         />
         
         <ProfileMenuItem 
